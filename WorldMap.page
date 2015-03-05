@@ -1,0 +1,119 @@
+<apex:page showHeader="false" 
+    sidebar="false" 
+    standardStylesheets="false" 
+    controller="WorldMapController"
+    > 
+
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>World Map</title>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css" />
+        <!-- Main worldmap css file -->
+        <apex:stylesheet value="{!URLFOR($Resource.WorldMap, '/worldmap/css/world_map.css')}"/>          
+    </head>
+    <body>
+        <div class="container-fluid">        
+            <div id="placeDetails"  class="row" style="margin: 25px; float: right; position: relative; z-index: 200;"></div>
+            <input type="button" value="-" id="zoomOutButton"  style="float: left" />
+            <input type="button" value="+" id="zoomInButton"  style="float: left" />
+            <div class="row" style="margin-top: 15px; float: left">
+                <div id="worldMapPanel" class="col-xs-12"  style="height: 420px"></div>
+                <div id="geocodePanel" class="col-xs-12" style="margin-left: 10px;">
+                    <input id="geocodeAddress" type="text" value=""  class="col-xs-7" style="margin-right: 10px" />
+                    <input type="button" value="Search Place" id="geocodeButton"  class="col-xs-4" />
+                </div>
+            </div>            
+        </div>
+
+        <!-- Button trigger modal -->
+        <button type="button" class="hide" data-toggle="modal" data-target="#placeModal" id="hiddenModalButton"></button>
+
+        <!-- Place Modal -->
+        <div class="modal fade" id="placeModal" tabindex="-1" role="dialog" aria-labelledby="placeModalTitle" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="placeModalTitle">Add a new place to the map</h4>
+                    </div>
+                    <div class="modal-body" id="placeModalBody">
+                        <form class="form-horizontal">
+                            <div class="form-group">
+                                <label for="placesList" class="col-sm-2 control-label">Place</label>
+                                <div class="col-sm-10">
+                                    <select id="placesList" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tripName" class="col-sm-2 control-label">Trip Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="tripName" placeholder="Trip name" />                            
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="fromDate" class="col-sm-2 control-label">From</label>
+                                <div class="col-sm-10">
+                                    <input type="date" class="form-control" id="fromDate" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="toDate" class="col-sm-2 control-label">To</label>
+                                <div class="col-sm-10">
+                                    <input type="date" class="form-control" id="toDate" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="tripStory" class="col-sm-2 control-label">Story</label>
+                                <div class="col-sm-10">
+                                    <textarea  class="form-control" id="tripStory" placeholder="Add some comments about the trip...." />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal" id="closeModalButton">Close</button>
+                        <button type="button" class="btn btn-primary" id="savePlaceButton">Save changes</button>
+                    </div>
+                </div>
+            </div>
+</div>
+        
+        <!-- jQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+        <!-- Raphael js -->
+        <script src="{!URLFOR($Resource.WorldMap, '/worldmap/js/world.js')}"></script>
+        <script src="{!URLFOR($Resource.WorldMap, '/worldmap/js/raphael.js')}"></script>
+        <!-- mustache Template -->
+        <script src="{!$Resource.mustache}"></script>
+        <!-- World map main js -->
+        <script src="worldmap.js"></script>
+        <!-- Google geolocation API -->
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+
+        <!-- Mustache Template -->
+        <script type="text/x-mustache" id="popoverTemplate">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{name}}</h3>
+                </div>
+                <div class="panel-body">
+                     <div style="margin-bottom: 20px;"><span class="label label-primary">Time</span></div>
+                     <div style="padding-left: 40px;">{{fromDate}} - {{toDate}}</div>
+                     <div style="margin-bottom: 20px; margin-top: 20px;"><span class="label label-primary">Story</span></div>
+                     <div  style="padding-left: 40px;">{{story}}</div>
+                </div>
+            </div>
+        </script>   
+        <!-- END mustache Template --> 
+        <script type="text/javascript">
+        	var map = '{!currentMapId}';
+        </script>
+    </body>
+
+</apex:page>
